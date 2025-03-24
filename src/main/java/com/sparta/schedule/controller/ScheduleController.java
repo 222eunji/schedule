@@ -3,6 +3,8 @@ package com.sparta.schedule.controller;
 import com.sparta.schedule.dto.ScheduleRequestDto;
 import com.sparta.schedule.dto.ScheduleResponseDto;
 import com.sparta.schedule.entity.Schedule;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.support.ScheduledMethodRunnable;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +17,7 @@ public class ScheduleController {
 
     private final Map<Long, Schedule> scheduleList = new HashMap<>();
 
+    // 일정 생성
     @PostMapping
     public ScheduleResponseDto createSchedule(@RequestBody ScheduleRequestDto dto) {
 
@@ -34,6 +37,7 @@ public class ScheduleController {
 
     }
 
+    // 전체 일정 조회
     @GetMapping
     public List<ScheduleResponseDto> findAllSchedules() {
 
@@ -44,11 +48,21 @@ public class ScheduleController {
             responseList.add(responseDto);
         }
 
+        // 조건에 따라 조회하기-모르겠음
         // 수정일 기준 내림차순 정렬은 put 메서드 생성 후 추가하기
 
         return responseList;
 
     }
 
+    // 선택 일정 조회
+    @GetMapping("/{id}")
+    public ScheduleResponseDto findScheduleByID(@PathVariable Long id) {
+
+        Schedule schedule = scheduleList.get(id);
+
+        return new ScheduleResponseDto(schedule);
+
+    }
 
 }
