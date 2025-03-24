@@ -17,8 +17,16 @@ public class Schedule {
     private LocalDate recordDate;
     private LocalDate modifyDate;
 
-    public void update(ScheduleRequestDto requestDto){
+    public void update(ScheduleRequestDto requestDto) {
         this.content = requestDto.getContent();
         this.writer = requestDto.getWriter();
+    }
+
+    public void updateContent(ScheduleRequestDto dto) {
+        this.content = dto.getContent();
+    }
+
+    public void updateWriter(ScheduleRequestDto dto) {
+        this.writer = dto.getWriter();
     }
 }

@@ -20,7 +20,7 @@ public class ScheduleController {
 
     // 일정 생성
     @PostMapping
-    public ScheduleResponseDto createSchedule(@RequestBody ScheduleRequestDto dto) {
+    public ResponseEntity<ScheduleResponseDto> createSchedule(@RequestBody ScheduleRequestDto dto) {
 
         // 식별자가 1씩 증가
         Long scheduleId = scheduleList.isEmpty() ? 1 : Collections.max(scheduleList.keySet())+ 1;
@@ -34,13 +34,13 @@ public class ScheduleController {
         //Inmemory DB에 저장
         scheduleList.put(scheduleId, schedule);
 
-        return new ScheduleResponseDto(schedule);
+        return new ResponseEntity<>(new ScheduleResponseDto(schedule), HttpStatus.CREATED) ;
 
     }
 
     // 전체 일정 조회
     @GetMapping
-    public List<ScheduleResponseDto> findAllSchedules() {
+    public ResponseEntity<List<ScheduleResponseDto>> findAllSchedules() {
 
         List<ScheduleResponseDto> responseList = new ArrayList<>();
 
@@ -52,31 +52,50 @@ public class ScheduleController {
         // 조건에 따라 조회하기-모르겠음
         // 수정일 기준 내림차순 정렬은 put 메서드 생성 후 추가하기
 
-        return responseList;
+        return new ResponseEntity<>(responseList, HttpStatus.OK);
 
     }
 
     // 선택 일정 조회
     @GetMapping("/{id}")
-    public ScheduleResponseDto findScheduleByID(@PathVariable Long id) {
+    public ResponseEntity<ScheduleResponseDto> findScheduleByID(@PathVariable Long id) {
 
         Schedule schedule = scheduleList.get(id);
 
-        return new ScheduleResponseDto(schedule);
+        return new ResponseEntity<>(new ScheduleResponseDto(schedule), HttpStatus.OK);
 
     }
 
-    // 선택 일정 수정
+    // 선택 일정 수정 - content
     @PatchMapping("/{id}")
-    public ScheduleResponseDto updateScheduleByID(
+    public ResponseEntity<ScheduleResponseDto> updateScheduleByID(
             @PathVariable Long id,
             @RequestBody ScheduleRequestDto requestDto){
 
         Schedule schedule = scheduleList.get(id);
 
-        schedule.update(requestDto);
+        // NPE 방지
+        if (schedule == null) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
 
-        return new ScheduleResponseDto(schedule);
+        // 비밀번호 검증
+        if (!schedule.getPassword().equals(requestDto.getPassword())){
+            return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+        }
+
+        // 입력된 값만 업데이트
+        if (requestDto.getContent() != null){
+            schedule.updateContent(requestDto);
+        }
+
+        if (requestDto.getWriter() != null){
+            schedule.updateWriter(requestDto);
+        }
+
+        // 수정일 업데이트 - DB연결하고 도전
+
+        return new ResponseEntity<>(new ScheduleResponseDto(schedule), HttpStatus.OK) ;
 
     }
 
