@@ -1,5 +1,6 @@
 package com.sparta.schedule.entity;
 
+import com.sparta.schedule.dto.ScheduleRequestDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -16,4 +17,8 @@ public class Schedule {
     private LocalDate recordDate;
     private LocalDate modifyDate;
 
+    public void update(ScheduleRequestDto requestDto){
+        this.content = requestDto.getContent();
+        this.writer = requestDto.getWriter();
+    }
 }
